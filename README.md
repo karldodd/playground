@@ -15,7 +15,7 @@ http://msdn.microsoft.com/en-us/library/hh228603(v=vs.110).aspx
 
 So, what's wrong with TPL Dataflow? Nothing. The library from Microsoft library looks simply great. However, in the tough real world there are some obstacles when we apply **RAW** TPL Dataflow. Let's look at an example:
 
-```csharp
+```c#
 var splitter = new TransformBlock<string, KeyValuePair<string, int>>(
     input =>
         {
@@ -28,14 +28,7 @@ var aggregater = new ActionBlock<KeyValuePair<string, int>>(
     pair =>
         {
             int oldValue;
-            if (dict.TryGetValue(pair.Key, out oldValue))
-            {
-                dict[pair.Key] = oldValue + pair.Value;
-            }
-            else
-            {
-                dict[pair.Key] = pair.Value;
-            }
+            dict[pair.Key] = dict.TryGetValue(pair.Key, out oldValue) ? oldValue + pair.Value : pair.Value;
         });
 
 splitter.LinkTo(aggregater, new DataflowLinkOptions() { PropagateCompletion = true});
